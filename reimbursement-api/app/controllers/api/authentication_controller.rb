@@ -9,7 +9,8 @@ class Api::AuthenticationController < ApplicationController
       time = Time.now + 24.hours.to_i
       render json: { token: token, message: 'Login success!',
                       exp: time.strftime("%m-%d-%Y %H:%M"),
-                      user_infos: @user }, 
+                      user_infos: @user,
+                      role: @user.role }, 
                       status: :ok
     else
       render json: { error: 'unauthorized' }, status: :unauthorized
