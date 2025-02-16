@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./reimbursement-api/
+    container_name: reimbursement_api
+    image: reimbursement/api-develop:latest
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - ./reimbursement-api:/app
+      - /app/tmp
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgres://postgres:password@db:5432/reimbursement
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  frontend:
+    build: ./reimbursement-frontend/
+    container_name: reimbursement_frontend
+    tty: true
+    volumes:
+      - ./reimbursement-frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3000/api
+    networks:
+      - app-network
+
+  db:
+    image: postgres:15
+    container_name: reimbursement_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=reimbursement
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  redis:
+    image: redis
+    container_name: reimbursement_redis
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
