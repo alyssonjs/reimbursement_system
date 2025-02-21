@@ -52,21 +52,22 @@ function goToLogin() {
 }
 </script>
 
-
 <style scoped>
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #42b983;
+  background-color: #3498db; /* Cor primária da identidade visual */
   padding: 1rem;
   color: #fff;
+  font-family: 'Roboto', sans-serif;
 }
 
 .navbar-brand a {
   color: #fff;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   text-decoration: none;
+  font-weight: bold;
 }
 
 .navbar-content {
@@ -74,17 +75,26 @@ function goToLogin() {
   align-items: center;
 }
 
+/* Botões de Login e Logout */
 .btn-login,
 .btn-logout {
   background-color: #fff;
-  color: #42b983;
+  color: #3498db;
   border: none;
   padding: 0.5rem 1rem;
   margin-left: 1rem;
   cursor: pointer;
   border-radius: 4px;
+  font-weight: 600;
+  transition: background-color 0.3s, color 0.3s;
 }
 
+.btn-login:hover,
+.btn-logout:hover {
+  background-color: #f0f0f0;
+}
+
+/* Informações do usuário */
 .user-info {
   display: flex;
   flex-direction: column;
@@ -97,6 +107,7 @@ function goToLogin() {
   font-size: 0.9rem;
 }
 
+/* Container do Hamburger para mobile */
 .hamburger-container {
   position: relative;
 }
@@ -104,14 +115,15 @@ function goToLogin() {
 .hamburger-btn {
   background: transparent;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   color: #fff;
   cursor: pointer;
+  margin-left: 1rem;
 }
 
 .hamburger-menu {
   position: absolute;
-  top: 100%;
+  top: 120%;
   right: 0;
   background-color: #fff;
   border: 1px solid #ccc;
@@ -123,12 +135,46 @@ function goToLogin() {
 }
 
 .hamburger-menu a {
-  color: #42b983;
+  color: #3498db;
   text-decoration: none;
-  padding: 0.3rem 0;
+  padding: 0.5rem 0;
+  font-weight: 500;
 }
 
 .hamburger-menu a:hover {
   text-decoration: underline;
+}
+
+/* Ajustes responsivos para dispositivos móveis */
+@media (max-width: 600px) {
+  .navbar {
+    flex-direction: column;
+    padding: 0.75rem;
+  }
+  
+  .navbar-brand {
+    margin-bottom: 0.5rem;
+  }
+  
+  .navbar-content {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .btn-login,
+  .btn-logout {
+    padding: 0.4rem 0.75rem;
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .user-info {
+    margin-right: 0.5rem;
+  }
+  
+  .hamburger-btn {
+    font-size: 1.5rem;
+    margin-left: 0.5rem;
+  }
 }
 </style>

@@ -26,7 +26,7 @@ export interface Expense {
   date: string;
   project_tag: { tag: string };
   project: { name: string };
-  status: 'pending' | 'success' | 'rejected';
+  status: 'pending' | 'accepted' | 'rejected';
   comment?: string;
 }
 

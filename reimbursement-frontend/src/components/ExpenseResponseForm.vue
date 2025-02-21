@@ -1,4 +1,3 @@
-<!-- frontend/src/components/ExpenseResponseForm.vue -->
 <template>
   <div class="modal">
     <div class="modal-content">

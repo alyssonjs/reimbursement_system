@@ -10,7 +10,6 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
-
 const authStore = useAuthStore();
 </script>
 
@@ -18,11 +17,16 @@ const authStore = useAuthStore();
 .home-view {
   text-align: center;
   padding: 2rem;
+  font-family: 'Roboto', sans-serif;
+  background-color: #f7f9fa;
+  color: #2c3e50;
 }
 
 h1 {
-  font-size: 2rem;
+  font-size: 2.5rem;
   margin-bottom: 1rem;
+  color: #3498db;
+  font-weight: 700;
 }
 
 p {
@@ -33,6 +37,27 @@ p {
 a {
   margin: 0 0.5rem;
   text-decoration: none;
-  color: #42b983;
+  color: #3498db;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: #2980b9;
+}
+
+/* Ajustes responsivos para dispositivos móveis */
+@media (max-width: 600px) {
+  .home-view {
+    padding: 1rem;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  p {
+    font-size: 1rem;
+  }
 }
 </style>

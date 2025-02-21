@@ -5,6 +5,7 @@ import ExpenseList from '@/components/ExpenseList.vue'
 import type { Expense } from '@/types'
 
 describe('ExpenseList.vue', () => {
+
   const sampleExpenses: Expense[] = [
     {
       id: 1,
@@ -20,7 +21,7 @@ describe('ExpenseList.vue', () => {
       date: '2023-10-02',
       project_tag: { tag: 'Transporte' },
       project: { name: 'Projeto B' },
-      status: 'success'
+      status: 'accepted'
     }
   ]
 
@@ -48,7 +49,7 @@ describe('ExpenseList.vue', () => {
     expect(rows).toHaveLength(sampleExpenses.length)
   })
 
-  it('displays the expense data correctly', () => {
+  it('displays the expense data correctly including the Chip status', () => {
     const wrapper = mount(ExpenseList, {
       props: { expenses: sampleExpenses }
     })
@@ -60,32 +61,33 @@ describe('ExpenseList.vue', () => {
       expect(cells[1].text()).toBe(expense.date)
       expect(cells[2].text()).toBe(expense.project_tag.tag)
       expect(cells[3].text()).toBe(expense.project.name)
-      expect(cells[4].text()).toBe(expense.status)
+      // O Chip exibe o status com a primeira letra maiúscula:
+      const expectedStatus = expense.status.charAt(0).toUpperCase() + expense.status.slice(1)
+      expect(cells[4].text()).toContain(expectedStatus)
     })
   })
 
-  it('emits the "edit" event with expense data when clicking the Edit button', async () => {
+  it('emits the "edit" event with expense data when clicking the edit icon', async () => {
     const wrapper = mount(ExpenseList, {
       props: { expenses: sampleExpenses }
     })
 
-    const firstRow = wrapper.find('tbody tr')
-    const editButton = firstRow.find('button:first-of-type')
-    await editButton.trigger('click')
+    // Procura o ícone de edição (span com a classe "action-icon edit")
+    const firstEditIcon = wrapper.find('tbody tr .action-icon.edit')
+    await firstEditIcon.trigger('click')
 
     expect(wrapper.emitted('edit')).toBeTruthy()
     expect(wrapper.emitted('edit')?.[0]).toEqual([sampleExpenses[0]])
   })
 
-  it('emits the "delete" event with expense data when clicking the Delete button', async () => {
+  it('emits the "delete" event with expense data when clicking the delete icon', async () => {
     const wrapper = mount(ExpenseList, {
       props: { expenses: sampleExpenses }
     })
 
-    const firstRow = wrapper.find('tbody tr')
-    const buttons = firstRow.findAll('button')
-    const deleteButton = buttons[1]
-    await deleteButton.trigger('click')
+    // Procura o ícone de exclusão (span com a classe "action-icon delete")
+    const firstDeleteIcon = wrapper.find('tbody tr .action-icon.delete')
+    await firstDeleteIcon.trigger('click')
 
     expect(wrapper.emitted('delete')).toBeTruthy()
     expect(wrapper.emitted('delete')?.[0]).toEqual([sampleExpenses[0]])
