@@ -4,10 +4,12 @@
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ],
+  "include": ["src", "tests"],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
-    }
-  }
+      "@/*": ["src/*", "tests/*"],
+    },
+    "types": ["@vue/test-utils", "vitest", "vitest/globals"]
+  },
 }

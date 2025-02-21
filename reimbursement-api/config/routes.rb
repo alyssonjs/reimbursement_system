@@ -10,6 +10,17 @@ Rails.application.routes.draw do
 
   namespace :api do
     post 'login', to: 'authentication#login'
-    resources :expenses, only: [:create, :index]
+    namespace :v1 do
+      namespace :manager do
+        resources :expenses, only: [:index, :show]
+        resources :projects, only: [:index, :show, :create, :update, :destroy]
+        get 'subordinates', to: 'users#subordinates'
+      end
+    
+      namespace :employee do
+        resources :expenses, only: [:index, :show, :create, :update, :destroy]
+        resources :projects, only: [:index, :show]
+      end
+    end
   end
 end

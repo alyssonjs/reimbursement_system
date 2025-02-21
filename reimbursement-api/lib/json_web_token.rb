@@ -1,13 +1,16 @@
-require 'jwt'
-
+# app/services/json_web_token.rb
 class JsonWebToken
-  SECRET_KEY = Rails.application.credentials.secret_key_base
-
-  def self.encode(payload)
-    JWT.encode(payload, SECRET_KEY)
+  def self.encode(payload, exp = 24.hours.from_now)
+    payload[:exp] = exp.to_i
+    secret = Rails.application.credentials.secret_key_base || ENV['JWT_SECRET']
+    JWT.encode(payload, secret)
   end
 
   def self.decode(token)
-    JWT.decode(token, SECRET_KEY).first
+    secret = Rails.application.credentials.secret_key_base || ENV['JWT_SECRET']
+    decoded = JWT.decode(token, secret)[0]
+    HashWithIndifferentAccess.new decoded
+  rescue JWT::DecodeError => e
+    nil
   end
 end

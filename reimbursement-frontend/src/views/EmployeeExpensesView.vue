@@ -1,15 +1,13 @@
 <template>
   <div class="employee-expenses-view">
-    <h1>Minhas Solicitações de Reembolso</h1>
-    <ExpenseList :expenses="expenses" />
-    <router-link to="/expenses/new">Nova Solicitação</router-link>
+    <EmployeeDashboard />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import ExpenseList from '@/components/ExpenseList.vue';
+import EmployeeDashboard from '@/components/EmployeeDashboard.vue';
 
 const expenses = ref([]);
 
@@ -17,6 +15,7 @@ onMounted(async () => {
   const response = await axios.get('/api/expenses');
   expenses.value = response.data;
 });
+
 </script>
 
 <style scoped>
