@@ -4,27 +4,41 @@
       <router-link to="/">Sistema de Reembolso</router-link>
     </div>
     <div class="navbar-content">
-      <template v-if="!authStore.token">
-        <button class="btn-login" @click="goToLogin">Login</button>
-      </template>
-      <template v-else>
-        <div class="user-info">
-          <span class="user-name">{{ authStore.userInfos?.name || 'Usuário' }}</span>
-          <span class="user-role">{{ authStore.role }}</span>
-        </div>
-        <button class="btn-logout" @click="handleLogout">Logout</button>
-        <div class="hamburger-container">
-          <button class="hamburger-btn" @click="toggleMenu">☰</button>
-          <div v-if="showHamburger" class="hamburger-menu">
-            <template v-if="authStore.role === 'employee'">
-              <router-link to="/employee/expenses" @click="toggleMenu">Solicitações</router-link>
-            </template>
-            <template v-else-if="authStore.role === 'manager'">
-              <router-link to="/manager/dashboard" @click="toggleMenu">Gerenciar</router-link>
-            </template>
-          </div>
-        </div>
-      </template>
+      <ul class="nav-items">
+        <li><router-link to="/">Home</router-link></li>
+        <template v-if="authStore.role === 'employee'">
+          <li>
+            <router-link to="/employee/expenses">Solicitações</router-link>
+          </li>
+        </template>
+        <template v-else-if="authStore.role === 'manager'">
+          <li>
+            <router-link to="/manager/dashboard">Gerenciar</router-link>
+          </li>
+          <li>
+            <router-link to="/manager/projects">Projetos</router-link>
+          </li>
+        </template>
+      </ul>
+      <button v-if="authStore.role" class="logout-btn" @click="handleLogout" title="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+      <button class="hamburger-btn" @click="toggleMenu" title="Menu">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div v-if="showHamburger" class="hamburger-menu">
+        <router-link to="/" @click="showHamburger = false">Home</router-link>
+        <template v-if="authStore.role === 'employee'">
+          <router-link to="/employee/expenses" @click="showHamburger = false">Solicitações</router-link>
+        </template>
+        <template v-else-if="authStore.role === 'manager'">
+          <router-link to="/manager/dashboard" @click="showHamburger = false">Gerenciar</router-link>
+          <router-link to="/manager/projects" @click="showHamburger = false">Projetos</router-link>
+        </template>
+        <button v-if="authStore.role" class="logout-btn-mobile" @click="handleLogout" title="Logout">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
     </div>
   </nav>
 </template>
@@ -34,9 +48,9 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 
-const router = useRouter();
-const authStore = useAuthStore();
 const showHamburger = ref(false);
+const authStore = useAuthStore();
+const router = useRouter();
 
 function toggleMenu() {
   showHamburger.value = !showHamburger.value;
@@ -46,10 +60,6 @@ function handleLogout() {
   authStore.logout();
   router.push({ name: 'Login' });
 }
-
-function goToLogin() {
-  router.push({ name: 'Login' });
-}
 </script>
 
 <style scoped>
@@ -57,7 +67,7 @@ function goToLogin() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #3498db; /* Cor primária da identidade visual */
+  background-color: #3498db;
   padding: 1rem;
   color: #fff;
   font-family: 'Roboto', sans-serif;
@@ -65,116 +75,99 @@ function goToLogin() {
 
 .navbar-brand a {
   color: #fff;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   text-decoration: none;
-  font-weight: bold;
 }
 
 .navbar-content {
   display: flex;
   align-items: center;
-}
-
-/* Botões de Login e Logout */
-.btn-login,
-.btn-logout {
-  background-color: #fff;
-  color: #3498db;
-  border: none;
-  padding: 0.5rem 1rem;
-  margin-left: 1rem;
-  cursor: pointer;
-  border-radius: 4px;
-  font-weight: 600;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-.btn-login:hover,
-.btn-logout:hover {
-  background-color: #f0f0f0;
-}
-
-/* Informações do usuário */
-.user-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin-right: 1rem;
-}
-
-.user-name,
-.user-role {
-  font-size: 0.9rem;
-}
-
-/* Container do Hamburger para mobile */
-.hamburger-container {
   position: relative;
 }
 
-.hamburger-btn {
+.nav-items {
+  display: flex;
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-items li a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.logout-btn {
   background: transparent;
   border: none;
-  font-size: 1.8rem;
   color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-left: 1rem;
+  transition: color 0.3s;
+}
+
+.logout-btn:hover {
+  color: #f1c40f;
+}
+
+.hamburger-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.8rem;
   cursor: pointer;
   margin-left: 1rem;
 }
 
 .hamburger-menu {
   position: absolute;
-  top: 120%;
-  right: 0;
+  top: 60px;
+  right: 1rem;
   background-color: #fff;
   border: 1px solid #ccc;
-  padding: 0.5rem;
   border-radius: 4px;
-  z-index: 10;
+  padding: 0.5rem;
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 }
 
 .hamburger-menu a {
   color: #3498db;
   text-decoration: none;
-  padding: 0.5rem 0;
-  font-weight: 500;
+  padding: 0.5rem;
 }
 
 .hamburger-menu a:hover {
-  text-decoration: underline;
+  background-color: #ecf0f1;
 }
 
-/* Ajustes responsivos para dispositivos móveis */
+.logout-btn-mobile {
+  background: transparent;
+  border: none;
+  color: #3498db;
+  font-size: 1rem;
+  cursor: pointer;
+  text-align: left;
+  padding: 0.5rem;
+}
+
+.logout-btn-mobile:hover {
+  color: #2980b9;
+}
+
 @media (max-width: 600px) {
-  .navbar {
-    flex-direction: column;
-    padding: 0.75rem;
+  .nav-items {
+    display: none;
   }
-  
-  .navbar-brand {
-    margin-bottom: 0.5rem;
-  }
-  
-  .navbar-content {
-    width: 100%;
-    justify-content: space-between;
-  }
-  
-  .btn-login,
-  .btn-logout {
-    padding: 0.4rem 0.75rem;
-    margin-left: 0.5rem;
-    font-size: 0.9rem;
-  }
-  
-  .user-info {
-    margin-right: 0.5rem;
-  }
-  
   .hamburger-btn {
-    font-size: 1.5rem;
-    margin-left: 0.5rem;
+    display: block;
+  }
+  .logout-btn {
+    display: none;
   }
 }
 </style>

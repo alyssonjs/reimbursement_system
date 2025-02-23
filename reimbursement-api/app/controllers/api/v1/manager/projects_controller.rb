@@ -3,28 +3,32 @@ class Api::V1::Manager::ProjectsController < ApplicationController
   before_action :require_manager
 
   def index
-    @projects = current_user.managed_projects.includes(:project_tags, :subordinates)
-    render json: @projects, include: [:project_tags, :subordinates]
+    @projects = current_user.managed_projects.includes(:project_tags, :users)
+    render json: @projects, each_serializer: ProjectSerializer
   end
 
   def show
     @project = current_user.managed_projects.find(params[:id])
-    render json: @project, include: [:project_tags, :subordinates]
+    render json: @project, serializer: ProjectSerializer
   end
 
   def create
-    @project = current_user.managed_projects.new(project_params)
+    @project = current_user.managed_projects.new(project_params.except(:subordinate_ids))
+
     if @project.save
-      render json: @project, status: :created
+      associate_subordinates
+      render_project(:created)
     else
       render json: { errors: @project.errors.full_messages }, status: :unprocessable_entity
     end
-  end
+  end  
 
   def update
     @project = current_user.managed_projects.find(params[:id])
+
     if @project.update(project_params)
-      render json: @project
+      associate_subordinates
+      render_project
     else
       render json: { errors: @project.errors.full_messages }, status: :unprocessable_entity
     end
@@ -46,7 +50,17 @@ class Api::V1::Manager::ProjectsController < ApplicationController
     params.require(:project).permit(
       :name, :description, :budget,
       project_tags_attributes: [:id, :tag, :allocated_budget, :_destroy],
-      subordinate_ids: []  # IDs dos subordinados a serem associados
+      subordinate_ids: []
     )
+  end
+
+  def associate_subordinates
+    return unless params[:project][:subordinate_ids]
+
+    @project.users = User.where(id: params[:project][:subordinate_ids])
+  end
+
+  def render_project(status = :ok)
+    render json: @project, status: status, serializer: ProjectSerializer
   end
 end

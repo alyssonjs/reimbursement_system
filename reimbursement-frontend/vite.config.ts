@@ -10,10 +10,10 @@ export default defineConfig({
     },
   },
   server: {
-    host: '0.0.0.0', // Permite que o Vite aceite conexões de fora do contêiner
-    port: 5173, // Porta do frontend
+    host: '0.0.0.0',
+    port: 5173,
     watch: {
-      usePolling: true, // Habilita polling para verificar mudanças no arquivo
+      usePolling: true,
     },
   },
 });

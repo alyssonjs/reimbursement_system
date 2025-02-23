@@ -86,17 +86,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_18_165555) do
     t.index ["manager_id"], name: "index_projects_on_manager_id"
   end
 
-  create_table "tags", force: :cascade do |t|
-    t.string "name"
-    t.string "taggable_type", null: false
-    t.bigint "taggable_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["taggable_type", "taggable_id"], name: "index_tags_on_taggable"
-  end
-
   create_table "users", force: :cascade do |t|
     t.string "email", null: false
+    t.string "name", null: false
     t.string "password_digest", null: false
     t.integer "role", default: 0, null: false
     t.bigint "manager_id"

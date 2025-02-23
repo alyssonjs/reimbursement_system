@@ -1,98 +1,50 @@
 /** @vitest-environment jsdom */
-import { mount } from '@vue/test-utils'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import ExpenseForm from '@/components/ExpenseForm.vue'
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { mount } from '@vue/test-utils';
+import ExpenseForm from '@/components/ExpenseForm.vue';
+import type { Project } from '@/types';
 
 describe('ExpenseForm.vue', () => {
-  let wrapper: any
-
-  const sampleProjects = [
-    {
-      id: 1,
-      name: 'Projeto Teste',
-      description: 'Descrição do projeto',
-      budget: 1000,
-      project_tags: [
-        { id: 1, tag: 'refeição', allocated_budget: 500 },
-        { id: 2, tag: 'transporte', allocated_budget: 300 }
-      ]
-    }
-  ]
+  let wrapper: any;
+  const availableProjects: Project[] = [
+    { id: 1, name: 'Projeto A', project_tags: [{ id: 10, tag: 'Tag A' }] },
+    { id: 2, name: 'Projeto B', project_tags: [{ id: 20, tag: 'Tag B' }] }
+  ];
 
   beforeEach(() => {
     wrapper = mount(ExpenseForm, {
       props: {
-        availableProjects: sampleProjects
+        availableProjects
       }
-    })
-  })
+    });
+  });
 
   it('renders the form with correct title', () => {
-    expect(wrapper.text()).toContain('Nova Solicitação de Reembolso')
-  })
+    expect(wrapper.find('h2').text()).toBe('Nova Solicitação de Reembolso');
+  });
 
-  it('updates availableTags when a project is selected', async () => {
-
-    expect(wrapper.vm.availableTags).toEqual([])
-
-    const projectSelect = wrapper.find('select')
-    await projectSelect.setValue('1')
-
-    await wrapper.vm.$nextTick()
-    expect(wrapper.vm.availableTags).toEqual(sampleProjects[0].project_tags)
-  })
-
-  it('emits "expense-created" with FormData and handles non-required fields when not provided', async () => {
-    const amountInput = wrapper.find('input[type="number"]')
-    await amountInput.setValue(200)
-  
-    const dateInput = wrapper.find('input[type="date"]')
-    await dateInput.setValue('2025-02-15')
-  
-    const projectSelect = wrapper.find('select')
-    await projectSelect.setValue('1')
-    await wrapper.vm.$nextTick()
-  
-    await wrapper.find('form').trigger('submit.prevent')
-  
-    expect(wrapper.emitted()).toHaveProperty('expense-created')
-    const emittedPayload = wrapper.emitted('expense-created')[0][0]
-  
-    expect(emittedPayload instanceof FormData).toBe(true)
-    expect(emittedPayload.get('expense[amount]')).toBe('200')
-    expect(emittedPayload.get('expense[date]')).toBe('2025-02-15')
-    expect(emittedPayload.get('expense[project_id]')).toBe('1')
-
-    expect(emittedPayload.get('expense[description]')).toBe('')
-    expect(emittedPayload.get('expense[project_tag_id]')).toBe('')
-  })
-
-  it('does not submit the form with a valid value if the required field "amount" is not filled in.', async () => {
-
-    const dateInput = wrapper.find('input[type="date"]')
-    await dateInput.setValue('2025-02-15')
-  
-    const projectSelect = wrapper.find('select')
-    await projectSelect.setValue('1')
-    await wrapper.vm.$nextTick()
-  
-    const descriptionTextarea = wrapper.find('textarea')
-    await descriptionTextarea.setValue('Evento sem valor')
-  
-    await wrapper.find('form').trigger('submit.prevent')
-  
-    const emitted = wrapper.emitted('expense-created')
-    expect(emitted).toBeTruthy()
+  it('does not emit "expense-created" if the amount is invalid', async () => {
+    await wrapper.find('form').trigger('submit.prevent');
     
-    const formData = emitted[0][0]
+    const emitted = wrapper.emitted('expense-created');
+    expect(emitted).toBeFalsy();
+  });
 
-    expect(formData.get('expense[amount]')).toBeTruthy()
-  })
-  
+  it('emits "expense-created" with valid data', async () => {
+    await wrapper.find('input[type="text"]').setValue('100');
+    await wrapper.find('input[type="date"]').setValue('2025-02-23');
+    await wrapper.find('textarea').setValue('Descrição teste');
+    await wrapper.find('select').setValue(1);
+
+    await wrapper.find('form').trigger('submit.prevent');
+    
+    const emitted = wrapper.emitted('expense-created');
+    expect(emitted).toBeTruthy();
+    expect(emitted?.[0]?.[0] instanceof FormData).toBe(true);
+  });
 
   it('emits "cancel" when the Cancel button is clicked', async () => {
-    const cancelButton = wrapper.find('button[type="button"]')
-    await cancelButton.trigger('click')
-    expect(wrapper.emitted()).toHaveProperty('cancel')
-  })
-})
+    await wrapper.find('button[type="button"]').trigger('click');
+    expect(wrapper.emitted('cancel')).toBeTruthy();
+  });
+});

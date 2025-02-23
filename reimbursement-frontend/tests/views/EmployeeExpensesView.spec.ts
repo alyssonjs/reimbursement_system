@@ -16,7 +16,7 @@ describe('EmployeeExpensesView.vue', () => {
     const fakeExpenses = [{ id: 1, amount: 50, date: '2023-11-01' }]
     mockedAxiosGet.mockResolvedValueOnce({ data: fakeExpenses })
 
-    const wrapper = mount(EmployeeExpensesView, {
+    mount(EmployeeExpensesView, {
       global: {
         stubs: {
           EmployeeDashboard: true

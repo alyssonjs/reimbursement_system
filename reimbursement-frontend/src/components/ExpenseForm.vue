@@ -1,13 +1,20 @@
 <template>
   <ModalWrapper>
     <Form @submit="submitForm" class="expense-form">
-      <h2>Nova Solicitação de Reembolso</h2>
-      <BaseInput
-        label="Valor (R$):"
-        type="number"
-        v-model="form.amount"
-        required
-      />
+      <h2>{{ formTitle }}</h2>
+      <div class="input-group">
+        <BaseInput
+          label="Valor (R$):"
+          type="text"
+          v-model="formattedAmount"
+          required
+          :class="{ 'error-input': amountTouched && !isAmountValid }"
+          @blur="handleBlur"
+        />
+        <span v-if="amountTouched && !isAmountValid" class="error-message">
+          Valor inválido. Insira somente números.
+        </span>
+      </div>
       <BaseInput
         label="Data:"
         type="date"
@@ -19,7 +26,11 @@
         v-model="form.description"
         required
       />
-      <BaseSelect label="Projeto:" v-model="selectedProjectId" required>
+      <BaseSelect 
+        label="Projeto:"
+        v-model="selectedProjectId" 
+        required
+      >
         <option disabled value="">Selecione um projeto</option>
         <option
           v-for="project in availableProjects"
@@ -44,106 +55,160 @@
       </BaseSelect>
       <FileUpload
         label="Recibo:"
-        required
-        @file-selected="file => form.receipt = file"
+        :required="!isEditMode"
+        accept=".jpeg,.jpg,.pdf"
+        @file-selected="validateFile($event, 'receipt')"
       />
       <FileUpload
-        label="Cupom Fiscal"
-        required
-        @file-selected="file => form.fiscalCoupon = file"
+        label="Cupom Fiscal:"
+        :required="!isEditMode"
+        accept=".jpeg,.jpg,.pdf"
+        @file-selected="validateFile($event, 'fiscal_coupon')"
       />
       <div class="buttons">
-        <button type="submit" :disabled="isSubmitting">Enviar Solicitação</button>
-        <button type="button" @click="$emit('cancel')">Cancelar</button>
+        <button type="submit" :disabled="isSubmitting || !isAmountValid">
+          {{ isEditMode ? 'Salvar Alterações' : 'Enviar Solicitação' }}
+        </button>
+        <button type="button" @click="cancel">Cancelar</button>
       </div>
     </Form>
   </ModalWrapper>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, ref, watch, PropType } from 'vue';
-import ModalWrapper from '@/components/ModalWrapper.vue';
-import Form from '@/components/form/Form.vue';
-import BaseInput from '@/components/form/BaseInput.vue';
-import BaseTextarea from '@/components/form/BaseTextarea.vue';
-import BaseSelect from '@/components/form/BaseSelect.vue';
-import FileUpload from '@/components/form/FileUpload.vue';
-import type { Project, ProjectTag } from '@/types';
+<script setup lang="ts">
+import { reactive, ref, computed, watch, onMounted } from 'vue'
+import ModalWrapper from '@/components/ModalWrapper.vue'
+import Form from '@/components/form/Form.vue'
+import BaseInput from '@/components/form/BaseInput.vue'
+import BaseTextarea from '@/components/form/BaseTextarea.vue'
+import BaseSelect from '@/components/form/BaseSelect.vue'
+import FileUpload from '@/components/form/FileUpload.vue'
+import type { Expense, Project, ProjectTag } from '@/types'
 
-export default defineComponent({
-  name: 'ExpenseForm',
-  components: {
-    ModalWrapper,
-    Form,
-    BaseInput,
-    BaseTextarea,
-    BaseSelect,
-    FileUpload,
+const props = defineProps<{
+  availableProjects: Project[],
+  expense?: Expense
+}>()
+
+const emit = defineEmits<{
+  (e: 'expense-created', formData: FormData): void,
+  (e: 'expense-updated', formData: FormData): void,
+  (e: 'cancel'): void
+}>()
+
+const isEditMode = computed(() => !!props.expense)
+const rawAmount = ref('')
+const amountTouched = ref(false)
+
+const isAmountValid = computed(() => {
+  return rawAmount.value !== '' && !isNaN(parseFloat(rawAmount.value))
+})
+
+
+
+const formattedAmount = computed({
+  get() {
+    if (!rawAmount.value) return ''
+    const numericValue = parseFloat(rawAmount.value.replace(',', '.'))
+    return isNaN(numericValue)
+      ? ''
+      : numericValue.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        })
   },
-  emits: ['expense-created', 'cancel'],
-  props: {
-    availableProjects: {
-      type: Array as PropType<Project[]>,
-      required: true,
-    },
-  },
-  setup(props, { emit }) {
-    const form = reactive({
-      amount: 0,
-      date: '',
-      description: '',
-      projectTagId: '',
-      projectId: '',
-      receipt: null as File | null,
-      fiscalCoupon: null as File | null,
-      cardReceipt: null as File | null,
-    });
-    const selectedProjectId = ref<string>('');
-    const availableTags = ref<ProjectTag[]>([]);
-
-    watch(selectedProjectId, (newId) => {
-      form.projectId = newId;
-      const project = props.availableProjects.find(p => p.id === Number(newId));
-      availableTags.value = project ? project.project_tags : [];
-    });
-
-    const isSubmitting = ref(false);
-
-    async function submitForm() {
-      isSubmitting.value = true;
-      const formData = new FormData();
-      formData.append('expense[amount]', form.amount.toString());
-      formData.append('expense[date]', form.date);
-      formData.append('expense[description]', form.description);
-      formData.append('expense[project_tag_id]', form.projectTagId);
-      formData.append('expense[project_id]', form.projectId);
-      if (form.receipt) {
-        formData.append('expense[receipt]', form.receipt);
-      }
-      if (form.fiscalCoupon) {
-        formData.append('expense[fiscal_coupon]', form.fiscalCoupon);
-      }
-      if (form.cardReceipt) {
-        formData.append('expense[card_receipt]', form.cardReceipt);
-      }
-      try {
-        emit('expense-created', formData);
-      } catch (error) {
-        console.error('Erro ao criar solicitação:', error);
-      } finally {
-        isSubmitting.value = false;
-      }
-    }
-
-    return {
-      form,
-      selectedProjectId,
-      availableTags,
-      isSubmitting,
-      submitForm,
-    };
-  },
+  set(value: string) {
+    const numericValue = value.replace(/[^\d,]/g, '')
+    rawAmount.value = numericValue
+    form.amount = numericValue ? parseFloat(numericValue.replace(',', '.')) : 0
+  }
 });
+
+const form = reactive({
+  amount: props.expense ? props.expense.amount : 0,
+  date: props.expense ? props.expense.date : '',
+  description: props.expense ? props.expense.description : '',
+  projectId: props.expense ? props.expense.project.id : '',
+  projectTagId: props.expense ? props.expense.project_tag.id : '',
+  receipt: props.expense ? props.expense.receipt : null,
+  fiscal_coupon: props.expense ? props.expense.fiscal_coupon : null,
+})
+
+const selectedProjectId = ref<string | number>(form.projectId)
+const availableTags = ref<ProjectTag[]>([])
+
+watch(selectedProjectId, (newId) => {
+  form.projectId = newId
+  updateAvailableTags(newId)
+})
+
+onMounted(() => {
+  if (isEditMode.value) {
+    updateAvailableTags(form.projectId)
+  }
+})
+
+function handleBlur() {
+  amountTouched.value = true
+}
+
+function updateAvailableTags(projectId: string | number) {
+  const project = props.availableProjects.find(p => p.id === Number(projectId))
+  availableTags.value = project ? project.project_tags : []
+}
+
+const formTitle = computed(() => isEditMode.value ? 'Editar Solicitação de Reembolso' : 'Nova Solicitação de Reembolso')
+
+const isSubmitting = ref(false)
+
+function validateFile(file, field) {
+  const allowedTypes = ['image/jpeg', 'application/pdf']
+  
+  if (!file || !allowedTypes.includes(file.type)) {
+    alert('O arquivo deve ser um JPEG ou PDF.')
+    return
+  }
+
+  form[field] = file
+}
+
+async function submitForm() {
+  isSubmitting.value = true
+
+  if (!isAmountValid.value) {
+    alert('Por favor, insira um valor numérico válido.')
+    isSubmitting.value = false
+    return
+  }
+
+  const formData = new FormData()
+  formData.append('expense[amount]', form.amount.toString())
+  formData.append('expense[date]', form.date)
+  formData.append('expense[description]', form.description)
+  formData.append('expense[project_tag_id]', String(form.projectTagId))
+  formData.append('expense[project_id]', String(form.projectId))
+  if (form.receipt) {
+    formData.append('expense[receipt]', form.receipt)
+  }
+  if (form.fiscal_coupon) {
+    formData.append('expense[fiscal_coupon]', form.fiscal_coupon)
+  }
+  try {
+    if (isEditMode.value) {
+      emit('expense-updated', formData)
+    } else {
+      emit('expense-created', formData)
+    }
+  } catch (error) {
+    console.error('Erro ao enviar solicitação:', error)
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+function cancel() {
+  emit('cancel')
+}
 </script>
 
 <style scoped>
@@ -158,6 +223,21 @@ export default defineComponent({
   font-weight: 700;
   text-align: center;
   margin-bottom: 1.5rem;
+}
+
+.input-group {
+  margin-bottom: 1rem;
+}
+
+.error-input {
+  border-color: red !important;
+}
+
+.error-message {
+  display: block;
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
 }
 
 .buttons {

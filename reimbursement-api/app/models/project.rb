@@ -10,6 +10,8 @@ class Project < ApplicationRecord
 
   validate :allocated_budget_within_total
 
+  accepts_nested_attributes_for :project_tags
+
   def allocated_budget_within_total
     return unless budget.present?
     total_allocated = project_tags.sum(:allocated_budget)

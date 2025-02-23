@@ -22,7 +22,7 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     display: flex;
-    align-items: center; /* Centralizado para telas maiores */
+    align-items: center;
     justify-content: center;
     z-index: 1000;
   }
@@ -38,12 +38,11 @@
     overflow-y: auto;
   }
   
-  /* Ajustes específicos para dispositivos móveis */
   @media (max-width: 600px) {
     .modal-overlay {
       align-items: flex-start;
-      padding-top: 10vh;   /* 10% do topo */
-      padding-bottom: 10vh; /* 10% da base */
+      padding-top: 10vh;
+      padding-bottom: 10vh;
     }
     
     .modal-content {
@@ -51,7 +50,7 @@
       max-width: 95%;
       padding: 1rem;
       border-radius: 0;
-      max-height: calc(100vh - 20vh); /* 100vh menos 10% do topo e 10% da base */
+      max-height: calc(100vh - 20vh);
     }
   }
   </style>

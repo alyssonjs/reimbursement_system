@@ -46,7 +46,6 @@ a:hover {
   color: #2980b9;
 }
 
-/* Ajustes responsivos para dispositivos móveis */
 @media (max-width: 600px) {
   .home-view {
     padding: 1rem;

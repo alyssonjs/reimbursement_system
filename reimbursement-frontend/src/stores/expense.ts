@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 import { useAuthStore } from './auth';
-import type { Expense, ExpenseInput, ExpenseUpdate } from '../types'
+import type { Expense, ExpenseInput, ExpenseUpdate } from '../types';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -30,12 +30,19 @@ export const useExpenseStore = defineStore('expense', {
       this.loading = true;
       try {
         const authStore = useAuthStore();
-        const response = await axios.post(`${apiUrl}/v1/employee/expenses`, expenseData, {
-          headers: { 
-            Authorization: `Bearer ${authStore.token}`,
-            'Content-Type': expenseData instanceof FormData ? 'multipart/form-data' : 'application/json'
-          },
-        });
+        const response = await axios.post(
+          `${apiUrl}/v1/employee/expenses`,
+          expenseData,
+          {
+            headers: {
+              Authorization: `Bearer ${authStore.token}`,
+              'Content-Type':
+                expenseData instanceof FormData
+                  ? 'multipart/form-data'
+                  : 'application/json',
+            },
+          }
+        );
         this.expenses.push(response.data);
       } catch (err: any) {
         this.error = err.response?.data?.error || err.message;
@@ -43,13 +50,17 @@ export const useExpenseStore = defineStore('expense', {
         this.loading = false;
       }
     },
-    async updateEmployeeExpense(expenseId: number, expenseData: Partial<ExpenseInput>) {
+    async updateEmployeeExpense(expenseId: number, expenseData: Partial<ExpenseInput> | FormData) {
       this.loading = true;
       try {
         const authStore = useAuthStore();
-        const response = await axios.put(`${apiUrl}/v1/employee/expenses/${expenseId}`, expenseData, {
-          headers: { Authorization: `Bearer ${authStore.token}` },
-        });
+        const response = await axios.put(
+          `${apiUrl}/v1/employee/expenses/${expenseId}`,
+          expenseData,
+          {
+            headers: { Authorization: `Bearer ${authStore.token}` },
+          }
+        );
         const index = this.expenses.findIndex(exp => exp.id === expenseId);
         if (index !== -1) {
           this.expenses[index] = response.data;
@@ -74,8 +85,9 @@ export const useExpenseStore = defineStore('expense', {
         this.loading = false;
       }
     },
-
     async fetchManagerExpenses() {
+      if (this.expenses.length > 0) return;
+    
       this.loading = true;
       try {
         const authStore = useAuthStore();
@@ -88,14 +100,39 @@ export const useExpenseStore = defineStore('expense', {
       } finally {
         this.loading = false;
       }
-    },
+    },    
     async updateManagerExpense(expenseId: number, expenseData: Partial<ExpenseInput & ExpenseUpdate>) {
       this.loading = true;
       try {
         const authStore = useAuthStore();
-        const response = await axios.put(`${apiUrl}/v1/manager/expenses/${expenseId}`, expenseData, {
-          headers: { Authorization: `Bearer ${authStore.token}` },
-        });
+        const response = await axios.put(
+          `${apiUrl}/v1/manager/expenses/${expenseId}`,
+          expenseData,
+          {
+            headers: { Authorization: `Bearer ${authStore.token}` },
+          }
+        );
+        const index = this.expenses.findIndex(exp => exp.id === expenseId);
+        if (index !== -1) {
+          this.expenses[index] = response.data;
+        }
+      } catch (err: any) {
+        this.error = err.response?.data?.error || err.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+    async updateExpenseStatus(expenseId: number, { status, comment }: { status: string; comment: string }) {
+      this.loading = true;
+      try {
+        const authStore = useAuthStore();
+        const response = await axios.put(
+          `${apiUrl}/v1/manager/expenses/${expenseId}/update_status`,
+          { status, comment },
+          {
+            headers: { Authorization: `Bearer ${authStore.token}` },
+          }
+        );
         const index = this.expenses.findIndex(exp => exp.id === expenseId);
         if (index !== -1) {
           this.expenses[index] = response.data;

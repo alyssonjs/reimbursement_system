@@ -40,41 +40,65 @@ const handleLogin = async () => {
 <style scoped>
 .login-view {
   max-width: 400px;
-  margin: 0 auto;
+  margin: 3rem auto;
   padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', sans-serif;
 }
 
 h1 {
   font-size: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #3498db;
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 label {
   display: block;
   margin-bottom: 0.5rem;
+  color: #2c3e50;
+  font-weight: 600;
 }
 
 input {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.75rem;
   font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: border-color 0.3s;
+}
+
+input:focus {
+  border-color: #3498db;
+  outline: none;
 }
 
 button {
-  padding: 0.5rem 1rem;
+  width: 100%;
+  padding: 0.75rem;
   font-size: 1rem;
-  background-color: #42b983;
-  color: white;
+  background-color: #3498db;
+  color: #fff;
   border: none;
+  border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover:not(:disabled) {
+  background-color: #2980b9;
 }
 
 .error {
-  color: red;
+  color: #e74c3c;
   margin-top: 1rem;
+  text-align: center;
 }
 </style>

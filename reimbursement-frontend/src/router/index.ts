@@ -4,6 +4,7 @@ import HomeView from '../views/HomeView.vue';
 import LoginView from '../views/LoginView.vue';
 import EmployeeExpensesView from '../views/EmployeeExpensesView.vue';
 import ManagerDashboardView from '../views/ManagerDashboardView.vue';
+import ManagerProjectsView from '../views/ManagerProjectsView.vue';
 import { useAuthStore } from '../stores/auth';
 
 export const routes: Array<RouteRecordRaw> = [
@@ -29,6 +30,12 @@ export const routes: Array<RouteRecordRaw> = [
     path: '/manager/dashboard', 
     name: 'ManagerDashboard', 
     component: ManagerDashboardView, 
+    meta: { requiresAuth: true, role: 'manager' } 
+  },
+  { 
+    path: '/manager/projects', 
+    name: 'ManagerProjects', 
+    component: ManagerProjectsView, 
     meta: { requiresAuth: true, role: 'manager' } 
   },
   { 

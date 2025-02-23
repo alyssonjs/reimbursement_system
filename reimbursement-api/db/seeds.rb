@@ -9,11 +9,13 @@ User.destroy_all
 
 puts "Criando gestores..."
 manager1 = User.create!(
+  name: "Manager One",
   email: "manager1@example.com",
   password: "password",
   role: :manager
 )
 manager2 = User.create!(
+  name: "Manager Two",
   email: "manager2@example.com",
   password: "password",
   role: :manager
@@ -21,24 +23,28 @@ manager2 = User.create!(
 
 puts "Criando empregados..."
 employee1 = User.create!(
+  name: "Employee One",
   email: "employee1@example.com",
   password: "password",
   role: :employee,
   manager: manager1
 )
 employee2 = User.create!(
+  name: "Employee Two",
   email: "employee2@example.com",
   password: "password",
   role: :employee,
   manager: manager1
 )
 employee3 = User.create!(
+  name: "Employee Three",
   email: "employee3@example.com",
   password: "password",
   role: :employee,
   manager: manager2
 )
 employee4 = User.create!(
+  name: "Employee Four",
   email: "employee4@example.com",
   password: "password",
   role: :employee,
@@ -68,4 +74,7 @@ tag4 = ProjectTag.create!(project: project2, tag: "infraestrutura", allocated_bu
 puts "Associando empregados aos projetos..."
 ProjectAssignment.create!(project: project1, user: employee1)
 ProjectAssignment.create!(project: project1, user: employee2)
-ProjectAssignment
+ProjectAssignment.create!(project: project2, user: employee3)
+ProjectAssignment.create!(project: project2, user: employee4)
+
+puts "Seeds concluídos!"

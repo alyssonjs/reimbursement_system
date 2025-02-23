@@ -34,6 +34,7 @@ export const useProjectStore = defineStore('project', {
           headers: { Authorization: `Bearer ${authStore.token}` },
         });
         this.projects.push(response.data);
+        await this.fetchProjects();
       } catch (err: any) {
         this.error = err.response?.data?.error || err.message;
       } finally {
@@ -71,7 +72,6 @@ export const useProjectStore = defineStore('project', {
         this.loading = false;
       }
     },
-
     async fetchEmployeeProjects() {
       this.loading = true;
       try {

@@ -5,16 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
 import ManagerDashboard from '@/components/ManagerDashboard.vue';
-
-const expenses = ref([]);
-
-onMounted(async () => {
-  const response = await axios.get('/api/expenses');
-  expenses.value = response.data;
-});
 
 </script>
 
