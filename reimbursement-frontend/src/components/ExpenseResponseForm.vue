@@ -16,7 +16,6 @@
         </p>
       </div>
 
-      <!-- Exibição dos anexos -->
       <div class="attachments" v-if="expense.receipt_url || expense.fiscal_coupon_url">
         <h3>Anexos</h3>
         <div class="attachment-list">

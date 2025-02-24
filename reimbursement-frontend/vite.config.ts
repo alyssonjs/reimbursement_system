@@ -1,4 +1,13 @@
-import { defineConfig } from 'vite';
+// Add this at the very top of vite.config.ts
+import { randomFillSync } from 'crypto';
+
+if (!globalThis.crypto || typeof globalThis.crypto.getRandomValues !== 'function') {
+  globalThis.crypto = {
+    getRandomValues: (array: Uint8Array) => randomFillSync(array)
+  } as Crypto;
+}
+
+import { defineConfig } from 'vitest/config';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
 
@@ -16,7 +25,6 @@ export default defineConfig({
       usePolling: true,
     },
   },
-  // @ts-ignore: Vitest configuration property is not recognized by Vite's types
   test: {
     globals: true,
     environment: 'jsdom',
