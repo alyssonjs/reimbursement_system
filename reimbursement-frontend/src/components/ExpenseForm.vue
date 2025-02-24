@@ -104,25 +104,22 @@ const isAmountValid = computed(() => {
   return rawAmount.value !== '' && !isNaN(parseFloat(rawAmount.value))
 })
 
-
-
 const formattedAmount = computed({
   get() {
     if (!rawAmount.value) return ''
-    const numericValue = parseFloat(rawAmount.value.replace(',', '.'))
-    return isNaN(numericValue)
-      ? ''
-      : numericValue.toLocaleString('pt-BR', {
-          style: 'currency',
-          currency: 'BRL'
-        })
+    const numericValue = parseFloat(rawAmount.value)
+    if (isNaN(numericValue)) return ''
+    return (numericValue / 100).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    })
   },
   set(value: string) {
-    const numericValue = value.replace(/[^\d,]/g, '')
-    rawAmount.value = numericValue
-    form.amount = numericValue ? parseFloat(numericValue.replace(',', '.')) : 0
+    const digits = value.replace(/\D/g, '')
+    rawAmount.value = digits
+    form.amount = digits ? parseFloat(digits) / 100 : 0
   }
-});
+})
 
 const form = reactive({
   amount: props.expense ? props.expense.amount : 0,

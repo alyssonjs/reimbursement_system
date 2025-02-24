@@ -16,6 +16,7 @@ export default defineConfig({
       usePolling: true,
     },
   },
+  // @ts-ignore: Vitest configuration property is not recognized by Vite's types
   test: {
     globals: true,
     environment: 'jsdom',
