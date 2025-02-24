@@ -4,6 +4,8 @@ import { mount } from '@vue/test-utils';
 import ExpenseForm from '@/components/ExpenseForm.vue';
 import type { Project } from '@/types';
 
+vi.stubGlobal('alert', vi.fn());
+
 describe('ExpenseForm.vue', () => {
   let wrapper: any;
   const availableProjects: Project[] = [
