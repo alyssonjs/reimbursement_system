@@ -17,18 +17,21 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.1.2'  # Alternatively, ensure a .ruby-version file exists.
+          ruby-version: '3.1.2'
       
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
 
-      - name: Install dependencies
+      - name: Install dependencies (Frontend)
+        working-directory: ./reimbursement-frontend
         run: npm install
 
-      - name: Run tests
+      - name: Run tests (Frontend)
+        working-directory: ./reimbursement-frontend
         run: npm run test
 
-      - name: Build project
+      - name: Build project (Frontend)
+        working-directory: ./reimbursement-frontend
         run: npm run build
