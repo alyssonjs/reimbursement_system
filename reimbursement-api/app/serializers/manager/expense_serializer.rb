@@ -1,12 +1,12 @@
-class ExpenseSerializer < ActiveModel::Serializer
+class Manager::ExpenseSerializer < ActiveModel::Serializer
   include Rails.application.routes.url_helpers
 
   attributes :id, :amount, :date, :description, :status, :comment,
              :receipt_url, :fiscal_coupon_url
 
-  belongs_to :project
-  belongs_to :project_tag
-  belongs_to :user
+  belongs_to :project, serializer: Manager::ProjectSerializer
+  belongs_to :project_tag, serializer: Manager::ProjectTagSerializer
+  belongs_to :user, serializer: UserSerializer
 
   def receipt_url
     if object.receipt.attached?

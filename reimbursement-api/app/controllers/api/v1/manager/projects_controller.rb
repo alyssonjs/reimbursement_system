@@ -4,12 +4,12 @@ class Api::V1::Manager::ProjectsController < ApplicationController
 
   def index
     @projects = current_user.managed_projects.includes(:project_tags, :users)
-    render json: @projects, each_serializer: ProjectSerializer
+    render json: @projects, each_serializer: Manager::ProjectSerializer
   end
 
   def show
     @project = current_user.managed_projects.find(params[:id])
-    render json: @project, serializer: ProjectSerializer
+    render json: @project, serializer: Manager::ProjectSerializer
   end
 
   def create
@@ -61,6 +61,6 @@ class Api::V1::Manager::ProjectsController < ApplicationController
   end
 
   def render_project(status = :ok)
-    render json: @project, status: status, serializer: ProjectSerializer
+    render json: @project, status: status, serializer: Manager::ProjectSerializer
   end
 end

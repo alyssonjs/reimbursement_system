@@ -6,21 +6,12 @@ class Api::V1::Manager::ExpensesController < ApplicationController
     subordinate_ids = current_user.subordinates.pluck(:id)
     @expenses = Expense.where(user_id: subordinate_ids)
                        .includes(:project, :user, :project_tag)
-
-    render json: @expenses, include: {
-      project: {},
-      project_tag: {},
-      user: { only: [:id, :name] }
-    }
+    render json: @expenses, each_serializer: Manager::ExpenseSerializer
   end
 
   def show
     if current_user.subordinates.include?(@expense.user)
-      render json: @expense, include: {
-        project: {},
-        project_tag: {},
-        user: { only: [:id, :name] }
-      }
+      render json: @expense, serializer: Manager::ExpenseSerializer
     else
       render json: { error: 'Acesso negado' }, status: :unauthorized
     end
@@ -40,11 +31,7 @@ class Api::V1::Manager::ExpensesController < ApplicationController
     comment = params[:comment]
 
     if @expense.update(status: new_status, comment: comment)
-      render json: @expense, include: {
-        project: {},
-        project_tag: {},
-        user: { only: [:id, :name] }
-      }
+      render json: @expense, serializer: Manager::ExpenseSerializer
     else
       render json: { error: 'Não foi possível atualizar o status' }, status: :unprocessable_entity
     end

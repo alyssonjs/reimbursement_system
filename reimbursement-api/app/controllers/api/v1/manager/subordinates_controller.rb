@@ -4,7 +4,7 @@ class Api::V1::Manager::SubordinatesController < ApplicationController
 
   def index
     @subordinates = current_user.subordinates
-    render json: @subordinates, serializer_each: UserSerializer
+    render json: @subordinates, serializer_each: Manager::UserSerializer
   end
 
   private

@@ -4,18 +4,18 @@ class Api::V1::Employee::ExpensesController < ApplicationController
 
   def index
     @expenses = current_user.expenses.includes(:project, :project_tag)
-    render json: @expenses, each_serializer: ExpenseSerializer
+    render json: @expenses, each_serializer: Employee::ExpenseSerializer
   end
   
   def show
     @expense = current_user.expenses.find(params[:id])
-    render json: @expense, serializer: ExpenseSerializer
+    render json: @expense, serializer: Employee::ExpenseSerializer
   end
   
   def create
     @expense = current_user.expenses.new(expense_params)
     if @expense.save
-      render json: @expense, serializer: ExpenseSerializer, status: :created
+      render json: @expense, serializer: Employee::ExpenseSerializer, status: :created
     else
       render json: { errors: @expense.errors.full_messages }, status: :unprocessable_entity
     end
@@ -24,7 +24,7 @@ class Api::V1::Employee::ExpensesController < ApplicationController
   def update
     @expense = current_user.expenses.find(params[:id])
     if @expense.update(expense_params)
-      render json: @expense, serializer: ExpenseSerializer
+      render json: @expense, serializer: Employee::ExpenseSerializer
     else
       render json: { errors: @expense.errors.full_messages }, status: :unprocessable_entity
     end
