@@ -100,27 +100,6 @@ export const useExpenseStore = defineStore('expense', {
       } finally {
         this.loading = false;
       }
-    },    
-    async updateManagerExpense(expenseId: number, expenseData: Partial<ExpenseInput & ExpenseUpdate>) {
-      this.loading = true;
-      try {
-        const authStore = useAuthStore();
-        const response = await axios.put(
-          `${apiUrl}/v1/manager/expenses/${expenseId}`,
-          expenseData,
-          {
-            headers: { Authorization: `Bearer ${authStore.token}` },
-          }
-        );
-        const index = this.expenses.findIndex(exp => exp.id === expenseId);
-        if (index !== -1) {
-          this.expenses[index] = response.data;
-        }
-      } catch (err: any) {
-        this.error = err.response?.data?.error || err.message;
-      } finally {
-        this.loading = false;
-      }
     },
     async updateExpenseStatus(expenseId: number, { status, comment }: { status: string; comment: string }) {
       this.loading = true;

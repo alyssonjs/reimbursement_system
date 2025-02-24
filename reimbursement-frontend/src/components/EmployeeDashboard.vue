@@ -76,6 +76,7 @@ async function handleExpenseCreated(formData: FormData) {
 
 async function handleExpenseUpdatedFromModal(formData: FormData) {
   if (selectedExpense.value) {
+
     await expenseStore.updateEmployeeExpense(selectedExpense.value.id, formData)
     closeExpenseDetails()
   }

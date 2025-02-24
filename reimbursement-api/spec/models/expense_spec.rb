@@ -11,6 +11,7 @@ RSpec.describe Expense, type: :model do
   
   it "serializes tags as an Array" do
     subject.save!
+
     expect(subject.reload.project_tag_id).to eq(project_tag.id)
   end
 end

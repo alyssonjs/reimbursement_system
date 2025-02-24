@@ -82,7 +82,7 @@
   
   const emit = defineEmits<{
     (e: 'close'): void,
-    (e: 'expense-updated', updatedExpense: Expense): void
+    (e: 'expense-updated', formData: FormData): void
   }>()
   
   const isEditing = ref(false)
@@ -108,7 +108,7 @@
   
   function handleUpdated(formData: FormData) {
     isEditing.value = false
-    emit('expense-updated', props.expense)
+    emit('expense-updated', formData)
   }
   
   function close() {

@@ -4,7 +4,7 @@
       <h2>{{ formTitle }}</h2>
       <div class="input-group">
         <BaseInput
-          label="Valor (R$):"
+          label="Value (R$):"
           type="text"
           v-model="formattedAmount"
           required
@@ -12,26 +12,26 @@
           @blur="handleBlur"
         />
         <span v-if="amountTouched && !isAmountValid" class="error-message">
-          Valor inválido. Insira somente números.
+          Invalid value. Please enter numbers only.
         </span>
       </div>
       <BaseInput
-        label="Data:"
+        label="Date:"
         type="date"
         v-model="form.date"
         required
       />
       <BaseTextarea
-        label="Descrição:"
+        label="Description:"
         v-model="form.description"
         required
       />
       <BaseSelect 
-        label="Projeto:"
+        label="Project:"
         v-model="selectedProjectId" 
         required
       >
-        <option disabled value="">Selecione um projeto</option>
+        <option disabled value="">Select a project</option>
         <option
           v-for="project in availableProjects"
           :key="project.id"
@@ -54,22 +54,22 @@
         </option>
       </BaseSelect>
       <FileUpload
-        label="Recibo:"
+        label="Receipt:"
         :required="!isEditMode"
         accept=".jpeg,.jpg,.pdf"
         @file-selected="validateFile($event, 'receipt')"
       />
       <FileUpload
-        label="Cupom Fiscal:"
+        label="Fiscal Coupon:"
         :required="!isEditMode"
         accept=".jpeg,.jpg,.pdf"
         @file-selected="validateFile($event, 'fiscal_coupon')"
       />
       <div class="buttons">
         <button type="submit" :disabled="isSubmitting || !isAmountValid">
-          {{ isEditMode ? 'Salvar Alterações' : 'Enviar Solicitação' }}
+          {{ isEditMode ? 'Save Changes' : 'Submit Request' }}
         </button>
-        <button type="button" @click="cancel">Cancelar</button>
+        <button type="button" @click="cancel">Cancel</button>
       </div>
     </Form>
   </ModalWrapper>
@@ -141,6 +141,7 @@ watch(selectedProjectId, (newId) => {
 
 onMounted(() => {
   if (isEditMode.value) {
+    rawAmount.value = (form.amount * 100).toString()
     updateAvailableTags(form.projectId)
   }
 })
@@ -160,24 +161,20 @@ const isSubmitting = ref(false)
 
 function validateFile(file, field) {
   const allowedTypes = ['image/jpeg', 'application/pdf']
-  
   if (!file || !allowedTypes.includes(file.type)) {
-    alert('O arquivo deve ser um JPEG ou PDF.')
+    alert('The file must be a JPEG or PDF.')
     return
   }
-
   form[field] = file
 }
 
 async function submitForm() {
   isSubmitting.value = true
-
   if (!isAmountValid.value) {
-    alert('Por favor, insira um valor numérico válido.')
+    alert('Please enter a valid numeric value.')
     isSubmitting.value = false
     return
   }
-
   const formData = new FormData()
   formData.append('expense[amount]', form.amount.toString())
   formData.append('expense[date]', form.date)
@@ -197,7 +194,7 @@ async function submitForm() {
       emit('expense-created', formData)
     }
   } catch (error) {
-    console.error('Erro ao enviar solicitação:', error)
+    console.error('Error submitting request:', error)
   } finally {
     isSubmitting.value = false
   }
